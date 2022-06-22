@@ -1,0 +1,120 @@
+//biblioteci
+ 
+ #include <Wire.h>  
+ #include <LiquidCrystal_I2C.h>  
+ #include <DHT.h>
+
+
+ LiquidCrystal_I2C lcd(0x27,16,2);  //definire LCD 16*2  
+
+ int val1 = 0 ;  //definirea variabilei pe care o vom folosi ca sa citim valoarea de la senzorul de umiditate al solulului 
+ int val2 = 0 ;  //definirea variabilei pe care o vom folosi ca sa citim valoarea de la senzorul de umiditate al solulului 
+
+// am folosit 2 variabile, deoarece am 2 senzori care imi vor citi umiditatea solului
+// unul il voi folosi pentru irigarea plantei cu apa
+// si celalalt senzor il voi folosi pentru irigarea plantei cu ingrasamant
+
+ int val3 = 0 ; //definesc inca o variabila care va fi folosita pentru citirea umiditatii apei care se poate scurge pe macheta de demonstratie
+// in cazul in care se inunda macheta de demonstratie, va suna buzzer-ul (sirena), pentru atentionare
+
+ void setup()  
+ {  
+
+ Serial.begin(9600);  
+ lcd.init();  //initializare ecran LCD
+ lcd.backlight();  
+
+ pinMode(34,INPUT); //definire pin care citeste de la senzorul de umiditate pentru a verifica daca pamantul este ud, daca nu e ud, sw va uda ghiveciul cu flori
+ pinMode(36,INPUT); //definire pin care citeste de la senzorul de umiditate pentru a verifica daca pamantul este ud, daca nu e ud, se vor turna substantele nutritive 
+ //(ingrasamant) in ghiveciul cu flori
+ pinMode(38,INPUT); //definire pin care citeste de la senzorul de umiditate daca macheta este uda
+ pinMode(40,OUTPUT); //definire pin pentru buzzer, care suna in cazul in care este inundata macheta
+
+  pinMode(42,OUTPUT);
+  pinMode(44,OUTPUT);
+  digitalWrite(42,LOW);
+  digitalWrite(44,LOW); 
+
+
+ lcd.setCursor(0,0);  
+
+ lcd.print("INGRIJIRE PLANTE");  
+ delay(1500);  
+
+ }  
+
+
+ void loop()  
+ {  
+
+ val1 = digitalRead(34); // soil moisture sensor output pin connected  
+ Serial.println(val1); // see the value in serial mpnitor in Arduino IDE  
+
+ delay(1000);  
+
+ val2 = digitalRead(36); // soil moisture sensor output pin connected  
+ Serial.println(val2); // see the value in serial mpnitor in Arduino IDE  
+
+ delay(1000);  
+
+ val3 = digitalRead(38); // soil moisture sensor output pin connected  
+ Serial.println(val3); // see the value in serial mpnitor in Arduino IDE  
+
+ delay(1000); 
+ 
+ if(val1 == 1 )  
+ {  
+ digitalWrite(42,LOW);  // inchidem releul, care se aseamana cu un intrerupator, prin urmare, circula curent prin acesta - pentru udarea plantei cu apa
+ lcd.setCursor(0,1);  
+ lcd.print("UDARE PLANTA");  
+ delay(3000);  
+ }  
+ else  
+ { 
+ digitalWrite(42,HIGH);  //deschidem releul (adica, il oprim) si el se aseamana cu un intrerupator, prin urmare, se opreste udarea plantei cu apa 
+ lcd.setCursor(0,1);  
+ lcd.print("TERMINAT UDARE");  
+ delay(1500);  
+ }  
+
+
+if(val2 == 1 )  
+ {  
+ digitalWrite(44,LOW);  // inchidem releul, care se aseamana cu un intrerupator, prin urmare, circula curent prin acesta - pentru udarea plantei cu ingrasamant
+
+ lcd.setCursor(0,1);  
+ lcd.print("HRANIRE PLANTA");  
+ delay(3000);  
+ }  
+ else  
+ {  
+ 
+ digitalWrite(44,HIGH);  //deschidem releul (adica, il oprim), si el se aseamana cu un intrerupator, prin urmare, se opreste udarea plantei cu substante nutritive 
+ lcd.setCursor(0,1);  
+ lcd.print("TERMINAT HRANIRE"); 
+ delay(1500);   
+ } 
+
+if(val3 == 1 )  
+{  
+
+digitalWrite(38,LOW); //daca senzorul pentru inundatie al machetei nu detecteaza nici o inundatie
+//digitalWrite(40,LOW);  //atunci, buzzerul (sirena) nu face nici un zgomot
+
+
+ }  
+else  
+{  
+digitalWrite(38,HIGH); //daca senzorul pentru inundatie al machetei detecteaza o inundatie
+digitalWrite(40,HIGH); //atunci, buzzerul (sirena) va face zgomot timp de 1 minut
+lcd.setCursor(0,0);  
+lcd.print("MACHETA INUNDATA"); 
+delay(1000); 
+lcd.setCursor(0,1);  
+lcd.print("OPRITI MONTAJUL"); 
+digitalWrite(42,HIGH);  //pin pentru releul care coordoneaza pompa pentru udarea plantei cu apa -- oprire releu
+digitalWrite(44,HIGH);  //pin pentru releul care coordoneaza pompa pentru udarea plantei cu substante nutritive (ingrasamant)-- oprire releu
+delay(1000); 
+digitalWrite(40,LOW);  //buzzerul (sirena) se opreste
+ } 
+ }  
