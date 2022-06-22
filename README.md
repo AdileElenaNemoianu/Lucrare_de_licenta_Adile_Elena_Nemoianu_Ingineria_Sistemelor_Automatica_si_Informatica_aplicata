@@ -1,1 +1,2 @@
-# Lucrare_de_licenta_Adile_Elena_Nemoianu_Ingineria_Sistemelor_Automatica_si_Informatica_aplicata
+Sistem informatic, electric si electronic pentru ingrijirea plantelor de apartament 
+Lucrare de licenta pentru sectia Ingineria Sistemelor (Automatica si Informatica aplicata)
